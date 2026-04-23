@@ -39,6 +39,11 @@ public class SecurityConfig {
                 // 4. ЕДИНЫЙ блок авторизации (anyRequest в самом конце!)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
 

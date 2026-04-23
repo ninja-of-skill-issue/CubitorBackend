@@ -5,7 +5,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+
 import org.example.cubitor.entity.User;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,9 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
+
+
+
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
 
@@ -23,7 +28,7 @@ public class JwtService {
         return Jwts.builder()
                 .setSubject(user.getEmail())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 час
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 48)) // 48 часов
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -54,7 +59,7 @@ public class JwtService {
                 .getBody();
     }
 
-    private Key getSignKey() {
-        return key;
-    }
+  private Key getSignKey() {
+      return key;
+  }
 }

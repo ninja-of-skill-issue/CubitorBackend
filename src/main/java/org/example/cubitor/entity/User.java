@@ -26,24 +26,17 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String username;
-
     @Column(unique = true, nullable = false)
     private String email;
-
     @Column(nullable = false)
     private String password;
-
     @Enumerated(EnumType.STRING)
     private Role role;
-
     private String elo;
     private String last_online;
     private String description;
     private String accaunt_creation_date;
-    private Integer theme = 0;
-    private Integer font = 0;
     private String avatar;
-
     @ManyToMany(fetch = FetchType.EAGER)
     private List<User> friends;
 
