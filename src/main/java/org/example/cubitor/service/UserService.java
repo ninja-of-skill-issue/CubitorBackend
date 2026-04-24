@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
-    private SolveRepository solveRepository;
+    private final SolveRepository solveRepository;
 
     public UserResponse getCurrentUser(String email) {
         User user = userRepository.findByEmail(email)
