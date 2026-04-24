@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,7 +34,7 @@ public class User implements UserDetails {
     private String elo;
     private String last_online;
     private String description;
-    private String accaunt_creation_date;
+    private String account_creation_date;
     private String avatar;
     @ManyToMany(fetch = FetchType.EAGER)
     private List<User> friends;
@@ -50,6 +49,11 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return email;
+    }
+
+
+    public String getTheActualUsername() {
+        return username;
     }
 
     @Override

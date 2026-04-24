@@ -11,7 +11,6 @@ public class UserResponse {
     private String username;
     private String role;
     private String token;
-    private String creation_date;
     private String elo;
     private String last_online;
     private String avatar;

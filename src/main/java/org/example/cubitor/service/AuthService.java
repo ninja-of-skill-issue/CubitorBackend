@@ -38,7 +38,7 @@ public class AuthService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
-                .accaunt_creation_date(timeView())
+                .account_creation_date(timeView())
                 .build();
 
         userRepository.save(user);
