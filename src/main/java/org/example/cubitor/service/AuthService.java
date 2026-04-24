@@ -60,35 +60,6 @@ public class AuthService {
         return new AuthResponse(token);
     }
 
-    public UserWithSolvesResponse getUserWithSolves(User user) {
-        List<Solve> solves = solveRepository.findAllByUser(user);
-
-        List<SolveResponse> solveResponses = solves.stream()
-                .map(s -> SolveResponse.builder()
-                        .id(s.getId())
-                        .tim(s.getTim())
-                        .scramble(s.getScramble())
-                        .creation_date(s.getCreation_date())
-                        .note(s.getNote())
-                        .penalty(s.getPenalty())
-                        .build())
-                .collect(Collectors.toList());
-
-        return UserWithSolvesResponse.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .accaunt_creation_date(user.getAccaunt_creation_date())
-                .role(user.getRole().name())
-                .elo(user.getElo())
-                .last_online(user.getLast_online())
-                .avatar(user.getAvatar())
-                .description(user.getDescription())
-                .friends(user.getFriends().toString())
-                .solves(solveResponses)
-                .build();
-    }
-
     public static String timeView() {
         DateTime nowUtc = new DateTime(DateTimeZone.UTC);
         DateTime nowKyiv = nowUtc.toDateTime(DateTimeZone.forID("Europe/Kiev"));

@@ -1,19 +1,25 @@
 package org.example.cubitor.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.cubitor.dto.SolveResponse;
 import org.example.cubitor.dto.UserResponse;
+import org.example.cubitor.dto.SolvesByUserResponse;
+import org.example.cubitor.entity.Solve;
 import org.example.cubitor.entity.User;
 import org.example.cubitor.exception.CustomException;
+import org.example.cubitor.repository.SolveRepository;
 import org.example.cubitor.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
+    private SolveRepository solveRepository;
 
     public UserResponse getCurrentUser(String email) {
         User user = userRepository.findByEmail(email)
@@ -40,6 +46,25 @@ public class UserService {
         return UserResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
+                .build();
+    }
+
+    public SolvesByUserResponse getSolvesByUser(User user) {
+        List<Solve> solves = solveRepository.findAllByUser(user);
+
+        List<SolveResponse> solveResponses = solves.stream()
+                .map(s -> SolveResponse.builder()
+                        .id(s.getId())
+                        .tim(s.getTim())
+                        .scramble(s.getScramble())
+                        .creation_date(s.getCreation_date())
+                        .note(s.getNote())
+                        .penalty(s.getPenalty())
+                        .build())
+                .collect(Collectors.toList());
+
+        return SolvesByUserResponse.builder()
+                .solves(solveResponses)
                 .build();
     }
 }
