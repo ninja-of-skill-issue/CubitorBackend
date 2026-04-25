@@ -40,7 +40,7 @@ public class MainController {
         return ResponseEntity.ok(userResponse);
     }
 
-    @PostMapping("solves_info")
+    @PostMapping("/solves_info")
     public ResponseEntity<SolvesByUserResponse> solvesByUser(Authentication authentication) {
         String email = authentication.getName();
 
