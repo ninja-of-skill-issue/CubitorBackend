@@ -7,6 +7,7 @@ import lombok.Data;
 @Builder
 public class SolveResponse {
     private Long id;
+    private Long user_id;
     private String tim;
     private String scramble;
     private String creation_date;

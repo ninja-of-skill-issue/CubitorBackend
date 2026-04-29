@@ -10,8 +10,6 @@ public class Solve {
     private Long id;
     @ManyToOne(fetch = FetchType.EAGER)
     private User user;
-    @ManyToOne(fetch = FetchType.EAGER )
-    private Event event;
     private String tim;
     private String scramble;
     private String creation_date;
@@ -32,14 +30,6 @@ public class Solve {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public Event getEvent() {
-        return event;
-    }
-
-    public void setEvent(Event event) {
-        this.event = event;
     }
 
     public String getTim() {
