@@ -40,7 +40,6 @@ public class SolveController {
         solve.setId(null);
         insertUserToSolve(solve, userDetails);
         solveService.addSolve(solve);
-        System.out.println(solve);
         return ResponseEntity.ok(solve);
     }
 

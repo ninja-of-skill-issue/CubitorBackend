@@ -11,6 +11,9 @@ import org.example.cubitor.repository.SolveRepository;
 import org.example.cubitor.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 

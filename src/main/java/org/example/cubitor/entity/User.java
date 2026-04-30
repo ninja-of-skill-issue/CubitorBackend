@@ -35,6 +35,7 @@ public class User implements UserDetails {
     private String last_online;
     private String description;
     private String account_creation_date;
+    @Column(columnDefinition = "LONGTEXT")
     private String avatar;
     @ManyToMany(fetch = FetchType.EAGER)
     private List<User> friends;
