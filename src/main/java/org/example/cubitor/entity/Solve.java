@@ -2,8 +2,10 @@ package org.example.cubitor.entity;
 
 
 import jakarta.persistence.*;
+import lombok.ToString;
 
 @Entity
+@ToString
 public class Solve {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

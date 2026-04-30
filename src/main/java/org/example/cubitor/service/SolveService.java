@@ -18,12 +18,18 @@ public class SolveService {
     private final UserRepository userRepository;
 
     public void addSolve(Solve solve) {
-        solve.setId(null);
         solveRepository.save(solve);
     }
 
-    public void deleteSolves(List<Solve> solves) {
+    public boolean deleteSolves(List<Solve> solves) {
+        if (solves == null) return false;
+
+        for (Solve solve : solves)
+            if (solveRepository.findAllById(solve.getId()).isEmpty())
+                return false;
+
         solveRepository.deleteAll(solves);
+        return true;
     }
 
 
