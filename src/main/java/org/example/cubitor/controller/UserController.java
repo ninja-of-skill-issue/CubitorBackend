@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.cubitor.entity.User;
 import org.example.cubitor.repository.UserRepository;
 import org.example.cubitor.service.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -47,4 +50,8 @@ public class UserController {
         userRepository.save(user);
     }
 
+    @PostMapping("/get_friends")
+    public ResponseEntity<List<User>> getFriends(@AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(null);
+    }
 }
