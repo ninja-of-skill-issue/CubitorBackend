@@ -3,6 +3,7 @@ package org.example.cubitor.controller;
 
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.example.cubitor.dto.UserResponse;
 import org.example.cubitor.entity.User;
 import org.example.cubitor.repository.UserRepository;
 import org.example.cubitor.service.UserService;
@@ -51,7 +52,10 @@ public class UserController {
     }
 
     @PostMapping("/get_friends")
-    public ResponseEntity<List<User>> getFriends(@AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(null);
+    public ResponseEntity<List<UserResponse>> getFriends(@AuthenticationPrincipal UserDetails userDetails) {
+        UserResponse userResponse = userService.getCurrentUser(userDetails.getUsername());
+        List<UserResponse> friends = userResponse.getFriends();
+
+        return ResponseEntity.ok(friends);
     }
 }

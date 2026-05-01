@@ -3,6 +3,8 @@ package org.example.cubitor.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Builder
 public class UserResponse {
@@ -16,5 +18,5 @@ public class UserResponse {
     private String avatar;
     private String description;
     private String account_creation_date;
-    private String friends;
+    private List<UserResponse> friends;
 }
