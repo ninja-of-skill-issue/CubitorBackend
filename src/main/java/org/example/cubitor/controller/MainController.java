@@ -51,4 +51,9 @@ public class MainController {
 
         return ResponseEntity.ok(solvesByUser);
     }
+
+    @PostMapping("all_users")
+    public ResponseEntity<List<UserResponse>> allUsers(Authentication authentication) {
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
 }

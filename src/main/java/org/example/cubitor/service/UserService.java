@@ -45,6 +45,20 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
+    private UserResponse mapToResponseNoFriends(User user) {
+        return UserResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .role(String.valueOf(user.getRole()))
+                .elo(String.valueOf(user.getElo()))
+                .description(user.getDescription())
+                .avatar(user.getAvatar())
+                .last_online(user.getLast_online())
+                .username(user.getTheActualUsername())
+                .account_creation_date(user.getAccount_creation_date())
+                .build();
+    }
+
     private UserResponse mapToResponse(User user) {
         return UserResponse.builder()
                 .id(user.getId())
@@ -56,7 +70,7 @@ public class UserService {
                 .last_online(user.getLast_online())
                 .username(user.getTheActualUsername())
                 .account_creation_date(user.getAccount_creation_date())
-                .friends(user.getFriends().toString())
+                .friends(user.getFriendships())
                 .build();
     }
 

@@ -3,11 +3,16 @@ package org.example.cubitor.controller;
 
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.example.cubitor.dto.PendingFriendshipResponse;
 import org.example.cubitor.dto.UserResponse;
+import org.example.cubitor.entity.Friendship;
 import org.example.cubitor.entity.User;
+import org.example.cubitor.repository.FriendshipRepository;
 import org.example.cubitor.repository.UserRepository;
+import org.example.cubitor.service.FriendshipService;
 import org.example.cubitor.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -25,9 +31,11 @@ public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FriendshipService friendshipService;
+    private final FriendshipRepository friendshipRepository;
 
     @PostMapping("/update_user")
-    public void editUser(@RequestBody User newUser,
+    public ResponseEntity<Boolean> editUser(@RequestBody User newUser,
                          @AuthenticationPrincipal UserDetails userDetails) {
         // 1. Получаем текущего пользователя из базы
         User user = userRepository.findByEmail(userDetails.getUsername())
@@ -49,13 +57,53 @@ public class UserController {
         }
 
         userRepository.save(user);
+        return ResponseEntity.ok(true);
+    }
+
+    @PostMapping("/delete_user")
+    public ResponseEntity<Boolean> deleteUser(@AuthenticationPrincipal User user) {
+        userService.deleteUser(user.getId());
+        return ResponseEntity.ok(true);
     }
 
     @PostMapping("/get_friends")
     public ResponseEntity<List<UserResponse>> getFriends(@AuthenticationPrincipal UserDetails userDetails) {
         UserResponse userResponse = userService.getCurrentUser(userDetails.getUsername());
-        List<UserResponse> friends = userResponse.getFriends();
+        List<User> friendUsers = friendshipService.getFriends(userResponse.getId());
+
+        List<UserResponse> friends = friendUsers.stream()
+                .map(user -> userService.getCurrentUser(user.getEmail()))
+                .toList();
 
         return ResponseEntity.ok(friends);
     }
+
+    @PostMapping("/add_friend")
+    public ResponseEntity<Boolean> addFriend(@RequestBody UserResponse userResponse,
+                                             @AuthenticationPrincipal User user) {
+        User friend = userRepository.findByEmail(userResponse.getEmail())
+                .orElseThrow(() -> new RuntimeException("Friend-user not found"));
+
+        friendshipService.addFriendship(friend.getId(), user.getId());
+
+        return ResponseEntity.ok(true);
+    }
+
+    @PostMapping("/remove_friend")
+    public ResponseEntity<Boolean> removeFriend(@RequestBody UserResponse userResponse,
+                                                @AuthenticationPrincipal User user) {
+        User friend = userRepository.findByEmail(userResponse.getEmail())
+                .orElseThrow(() -> new RuntimeException("Friend-user not found"));
+
+        friendshipService.removeFriendship(friend.getId(), user.getId());
+
+        return ResponseEntity.ok(true);
+    }
+
+    @PostMapping("/pending_friend_requests")
+    public ResponseEntity<List<PendingFriendshipResponse>> pendingFriendRequests(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(friendshipService.getPendingFriendships(user.getId()));
+    }
+
+
 }
