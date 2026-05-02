@@ -25,14 +25,14 @@ public class Friendship {
     private User friend;
 
     @ColumnDefault("false")
-    private Boolean userAccepted;
+    private Boolean userAccepted = false;
 
     @ColumnDefault("false")
-    private Boolean friendAccepted;
+    private Boolean friendAccepted = false;
 
 
     public User getMyFriend(User me) {
-        return this.user.equals(me) ? this.friend : this.user;
+        return user.equals(me) ? friend : user;
     }
 }
 

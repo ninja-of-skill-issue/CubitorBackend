@@ -63,7 +63,6 @@ public class FriendshipService {
         friendshipRepository.delete(friendship);
         requstingUser.getFriendships().remove(friendship);
         friend.getFriendships().remove(friendship);
-        friendshipRepository.save(friendship);
         userRepository.save(requstingUser);
         userRepository.save(friend);
     }
@@ -71,6 +70,7 @@ public class FriendshipService {
     public List<User> getFriends(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
 
         List<User> friends = user.getFriendships().stream()
                 .filter(f -> f.getFriendAccepted() && f.getUserAccepted()) // filtering pending friendships
@@ -85,7 +85,7 @@ public class FriendshipService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         List<PendingFriendshipResponse> pendingFriendships = user.getFriendships().stream()
-                .filter(f -> !(f.getFriendAccepted() || f.getUserAccepted()))
+                .filter(f -> !(f.getFriendAccepted() && f.getUserAccepted()))
                 .map(this::mapToPendingResponse)
                 .toList();
 
@@ -93,22 +93,21 @@ public class FriendshipService {
     }
 
     private List<User> find2UsersById(Long id1, Long id2) {
-        List<User> users = userRepository.findAllById(List.of(id1, id2));
-        if (users.size() < 2) throw new RuntimeException("One or both users not found");
+        User user1 = userRepository.findById(id1).orElseThrow(() -> new RuntimeException("User1 not found"));
+        User user2 = userRepository.findById(id2).orElseThrow(() -> new RuntimeException("User2 not found"));
 
-        // Sort so the user with id1 comes first
-        return users.stream()
-                .sorted(Comparator.comparing(user -> user.getId().equals(id1) ? 0 : 1))
-                .toList();
+        return List.of(user1, user2);
     }
     private PendingFriendshipResponse mapToPendingResponse(Friendship friendship) {
         if (friendship.getFriendAccepted() && friendship.getUserAccepted()) return null;
-        User user = friendship.getUserAccepted() ? friendship.getUser() : friendship.getFriend();
-        User destination = friendship.getFriendAccepted() ? friendship.getFriend() : friendship.getUser();
+        User acceptedOne = friendship.getUserAccepted() ? friendship.getUser() : friendship.getFriend();
+        User pendingOne = (acceptedOne == friendship.getUser()) ? friendship.getFriend() : friendship.getUser();
+
         return PendingFriendshipResponse.builder()
-                .user(userService.getCurrentUser(user.getEmail()))
-                .destination(userService.getCurrentUser(destination.getEmail()))
+                .user(userService.getCurrentUser(acceptedOne.getEmail()))
+                .destination(userService.getCurrentUser(pendingOne.getEmail()))
                 .build();
+
     }
 
 }

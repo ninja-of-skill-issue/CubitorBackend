@@ -38,10 +38,29 @@ public class User implements UserDetails {
     private String account_creation_date;
     @Column(columnDefinition = "LONGTEXT")
     private String avatar;
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Friendship> friendships;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Solve> solves;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Friendship> friendshipsSent = new ArrayList<>();
+    @OneToMany(mappedBy = "friend", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Friendship> friendshipsReceived = new ArrayList<>();
+
+    public List<Friendship> getFriendships() {
+        List<Friendship> all = new ArrayList<>();
+        if (friendshipsSent != null) all.addAll(friendshipsSent);
+        if (friendshipsReceived != null) all.addAll(friendshipsReceived);
+        return all;
+    }
+    public void setFriendships(List<Friendship> friendships) {
+        this.friendshipsSent = friendships;
+    }
+
+    public String getTheActualUsername() {
+        return username;
+    }
+    public void setTheActualUsername(String username) {
+        this.username = username;
+    }
 
     // --- Spring Security ---
 
@@ -53,11 +72,6 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return email;
-    }
-
-
-    public String getTheActualUsername() {
-        return username;
     }
 
     @Override
