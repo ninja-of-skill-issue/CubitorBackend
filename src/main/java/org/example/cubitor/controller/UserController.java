@@ -100,10 +100,6 @@ public class UserController {
         return ResponseEntity.ok(true);
     }
 
-    @PostMapping("/pending_friend_requests")
-    public ResponseEntity<List<PendingFriendshipResponse>> pendingFriendRequests(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(friendshipService.getPendingFriendships(user.getId()));
-    }
 
 
 }
