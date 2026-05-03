@@ -7,8 +7,6 @@ import org.example.cubitor.repository.SetSetRepository;
 import org.example.cubitor.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class SetSetService {
@@ -16,20 +14,35 @@ public class SetSetService {
     private final UserRepository userRepository;
 
 
-    public SetSet save(SetSet setSet) {
-        return setSetRepository.save(setSet);
-    }
+    public void updateSettings(String email, SetSet newSettings) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-    public void delete(SetSet setSet) {
-        setSetRepository.delete(setSet);
-    }
 
-    public List<SetSet> findAll() {
-        return setSetRepository.findAll();
+        SetSet settings = setSetRepository.findByUser(user)
+                .orElse(new SetSet());
+
+
+        settings.setBio(newSettings.getBio());
+        settings.setTheme(newSettings.getTheme());
+        settings.setFavoriteEvent(newSettings.getFavoriteEvent());
+        settings.setFont(newSettings.getFont());
+        settings.setCelebrationTime(newSettings.getCelebrationTime());
+        settings.setConfirmSolveDeletion(newSettings.getConfirmSolveDeletion());
+        settings.setCubingGoal(newSettings.getCubingGoal());
+        settings.setUseInspection(newSettings.getUseInspection());
+        settings.setSaveMinigameSolves(newSettings.getSaveMinigameSolves());
+        settings.setWidgetCount(newSettings.getWidgetCount());
+        settings.setUser(user);
+
+        setSetRepository.save(settings);
     }
 
     public SetSet findByUserEmail(String email) {
-        return setSetRepository.findAllByUser(userRepository.findByEmail(email).orElse(null))
-                .stream().findFirst().orElse(null);
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) return null;
+
+
+        return setSetRepository.findByUser(user).orElse(null);
     }
 }

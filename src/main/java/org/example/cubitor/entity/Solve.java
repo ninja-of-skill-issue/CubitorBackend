@@ -22,4 +22,8 @@ public class Solve {
     private String note;
     private Integer penalty;
 
+    @ManyToOne
+    private Event event;
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Folder folder;
 }
