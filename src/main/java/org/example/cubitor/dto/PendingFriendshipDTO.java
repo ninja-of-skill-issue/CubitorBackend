@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PendingFriendshipResponse {
-    private UserResponse user;
-    private UserResponse destination;
+public class PendingFriendshipDTO {
+    private UserDTO user;
+    private UserDTO destination;
 }

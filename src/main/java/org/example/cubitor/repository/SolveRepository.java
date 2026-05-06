@@ -1,6 +1,5 @@
 package org.example.cubitor.repository;
 
-import org.example.cubitor.dto.UserResponse;
 import org.example.cubitor.entity.Solve;
 import org.example.cubitor.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;

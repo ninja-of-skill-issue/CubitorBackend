@@ -10,7 +10,7 @@ import java.util.List;
 public class Folder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
     @ManyToOne(cascade = CascadeType.ALL)
     private User user;
 

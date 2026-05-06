@@ -16,7 +16,7 @@ public class Solve {
     private Long id;
     @ManyToOne(fetch = FetchType.EAGER)
     private User user;
-    private String tim;
+    private Integer time;
     private String scramble;
     private String creation_date;
     private String note;

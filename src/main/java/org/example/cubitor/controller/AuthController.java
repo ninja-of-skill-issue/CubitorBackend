@@ -2,7 +2,7 @@ package org.example.cubitor.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.cubitor.dto.AuthResponse;
+import org.example.cubitor.dto.AuthDTO;
 import org.example.cubitor.dto.LoginRequest;
 import org.example.cubitor.dto.RegisterRequest;
 import org.example.cubitor.service.AuthService;
@@ -20,12 +20,12 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthDTO> register(@RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authService.register(request));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(
+    public ResponseEntity<AuthDTO> login(
             @RequestBody @Valid LoginRequest request
     ) {
         return ResponseEntity.ok(authService.login(request));

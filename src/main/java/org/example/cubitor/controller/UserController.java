@@ -1,18 +1,15 @@
 package org.example.cubitor.controller;
 
 
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.example.cubitor.dto.PendingFriendshipResponse;
-import org.example.cubitor.dto.UserResponse;
-import org.example.cubitor.entity.Friendship;
+import org.example.cubitor.dto.UserDTO;
 import org.example.cubitor.entity.User;
-import org.example.cubitor.repository.FriendshipRepository;
+import org.example.cubitor.exception.CustomException;
 import org.example.cubitor.repository.UserRepository;
+import org.example.cubitor.service.DTOService;
 import org.example.cubitor.service.FriendshipService;
 import org.example.cubitor.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -32,31 +28,16 @@ public class UserController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final FriendshipService friendshipService;
-    private final FriendshipRepository friendshipRepository;
+    private final DTOService dtoService;
 
     @PostMapping("/update_user")
     public ResponseEntity<Boolean> editUser(@RequestBody User newUser,
-                         @AuthenticationPrincipal UserDetails userDetails) {
-        // 1. Получаем текущего пользователя из базы
-        User user = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                         @AuthenticationPrincipal User user) {
 
-        // 2. Обновляем обычные поля
-        user.setAvatar(newUser.getAvatar());
-        user.setElo(newUser.getElo());
-        user.setDescription(newUser.getDescription());
-        user.setUsername(newUser.getTheActualUsername());
-        System.out.println(newUser.getDescription());
-
-        // 3. Обновляем пароль ТОЛЬКО если он пришел в запросе
-        if (newUser.getPassword() != null && !newUser.getPassword().isEmpty()) {
-            // Обязательно хешируем перед сохранением!
-            // passwordEncoder должен быть внедрен через конструктор
-            String encodedPassword = passwordEncoder.encode(newUser.getPassword());
-            user.setPassword(encodedPassword);
-        }
-
+        user.setPassword(passwordEncoder.encode(newUser.getPassword()));
+        dtoService.updateEntity(user, newUser);
         userRepository.save(user);
+
         return ResponseEntity.ok(true);
     }
 
@@ -67,11 +48,11 @@ public class UserController {
     }
 
     @PostMapping("/get_friends")
-    public ResponseEntity<List<UserResponse>> getFriends(@AuthenticationPrincipal UserDetails userDetails) {
-        UserResponse userResponse = userService.getCurrentUser(userDetails.getUsername());
-        List<User> friendUsers = friendshipService.getFriends(userResponse.getId());
+    public ResponseEntity<List<UserDTO>> getFriends(@AuthenticationPrincipal UserDetails userDetails) {
+        UserDTO userDTO = userService.getCurrentUser(userDetails.getUsername());
+        List<User> friendUsers = friendshipService.getFriends(userDTO.getId());
 
-        List<UserResponse> friends = friendUsers.stream()
+        List<UserDTO> friends = friendUsers.stream()
                 .map(user -> userService.getCurrentUser(user.getEmail()))
                 .toList();
 
@@ -79,10 +60,10 @@ public class UserController {
     }
 
     @PostMapping("/add_friend")
-    public ResponseEntity<Boolean> addFriend(@RequestBody UserResponse userResponse,
+    public ResponseEntity<Boolean> addFriend(@RequestBody UserDTO userDTO,
                                              @AuthenticationPrincipal User user) {
-        User friend = userRepository.findByEmail(userResponse.getEmail())
-                .orElseThrow(() -> new RuntimeException("Friend-user not found"));
+        User friend = userRepository.findByEmail(userDTO.getEmail())
+                .orElseThrow(() -> new CustomException("Friend-user not found"));
 
         friendshipService.addFriendship(friend.getId(), user.getId());
 
@@ -90,10 +71,10 @@ public class UserController {
     }
 
     @PostMapping("/remove_friend")
-    public ResponseEntity<Boolean> removeFriend(@RequestBody UserResponse userResponse,
+    public ResponseEntity<Boolean> removeFriend(@RequestBody UserDTO userDTO,
                                                 @AuthenticationPrincipal User user) {
-        User friend = userRepository.findByEmail(userResponse.getEmail())
-                .orElseThrow(() -> new RuntimeException("Friend-user not found"));
+        User friend = userRepository.findByEmail(userDTO.getEmail())
+                .orElseThrow(() -> new CustomException("Friend-user not found"));
 
         friendshipService.removeFriendship(friend.getId(), user.getId());
 

@@ -1,14 +1,13 @@
 package org.example.cubitor.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.cubitor.dto.SolveResponse;
-import org.example.cubitor.dto.UserResponse;
+
 import org.example.cubitor.entity.Solve;
-import org.example.cubitor.entity.User;
 import org.example.cubitor.repository.SolveRepository;
 import org.example.cubitor.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -17,8 +16,22 @@ public class SolveService {
     private final SolveRepository solveRepository;
     private final UserRepository userRepository;
 
-    public void addSolve(Solve solve) {
-        solveRepository.save(solve);
+    public List<Solve> editSolves(List<Solve> solves) {
+        List<Solve> notEdited = new ArrayList<>();
+        List<Solve> saved = new ArrayList<>();
+
+        for (Solve solve : solves) {
+            if (solveRepository.findAllById(solve.getId()) == null) {
+                notEdited.add(solve);
+                continue;
+            }
+            if (userRepository.findById(solve.getUser().getId()).isEmpty())
+                continue;
+            saved.add(solve);
+        }
+
+        solveRepository.saveAll(saved);
+        return notEdited;
     }
 
     public boolean deleteSolves(List<Solve> solves) {
@@ -33,15 +46,5 @@ public class SolveService {
     }
 
 
-    private SolveResponse mapToResponse(Solve solve) {
-        return SolveResponse.builder()
-                .id(solve.getId())
-                .user_id(solve.getUser().getId())
-                .tim(solve.getTim())
-                .note(solve.getNote())
-                .creation_date(solve.getCreation_date())
-                .penalty(solve.getPenalty())
-                .scramble(solve.getScramble())
-                .build();
-    }
+
 }

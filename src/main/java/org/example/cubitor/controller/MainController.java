@@ -2,11 +2,11 @@ package org.example.cubitor.controller;
 
 
 import lombok.RequiredArgsConstructor;
-import org.example.cubitor.dto.UserResponse;
-import org.example.cubitor.dto.SolvesByUserResponse;
-import org.example.cubitor.entity.Solve;
-import org.example.cubitor.repository.SolveRepository;
-import org.example.cubitor.service.AuthService;
+import org.example.cubitor.dto.SolveDTO;
+import org.example.cubitor.dto.UserDTO;
+
+import org.example.cubitor.exception.CustomException;
+import org.example.cubitor.service.DTOService;
 import org.example.cubitor.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -23,37 +23,35 @@ import java.util.List;
 public class MainController {
 
     private final UserService userService;
-    private final SolveRepository solveRepository;
-    private final UserRepository userRepository; // ← додати
-    private final AuthService authService;
+    private final UserRepository userRepository;
+    private final DTOService dtoService;
 
 
     @PostMapping("/user_info")
-    public ResponseEntity<UserResponse> mainPage(Authentication authentication) {
+    public ResponseEntity<UserDTO> mainPage(Authentication authentication) {
 
         String email = authentication.getName();
 
-        UserResponse userResponse = userService.getCurrentUser(email);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new CustomException("User not found"));
 
-        return ResponseEntity.ok(userResponse);
+        return ResponseEntity.ok(dtoService.toDTO(user));
     }
 
     @PostMapping("/solves_info")
-    public ResponseEntity<SolvesByUserResponse> solvesByUser(Authentication authentication) {
+    public ResponseEntity<List<SolveDTO>> solvesByUser(Authentication authentication) {
         String email = authentication.getName();
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new CustomException("User not found"));
 
-        SolvesByUserResponse solvesByUser = userService.getSolvesByUser(user);
+        List<SolveDTO> solvesByUser = userService.getSolvesByUser(user);
 
         return ResponseEntity.ok(solvesByUser);
     }
 
     @PostMapping("all_users")
-    public ResponseEntity<List<UserResponse>> allUsers(Authentication authentication) {
+    public ResponseEntity<List<UserDTO>> allUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 }

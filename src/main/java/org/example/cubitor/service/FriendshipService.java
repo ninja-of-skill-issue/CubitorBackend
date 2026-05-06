@@ -1,14 +1,13 @@
 package org.example.cubitor.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.cubitor.dto.PendingFriendshipResponse;
+import org.example.cubitor.dto.PendingFriendshipDTO;
 import org.example.cubitor.entity.Friendship;
 import org.example.cubitor.entity.User;
 import org.example.cubitor.repository.FriendshipRepository;
 import org.example.cubitor.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -28,7 +27,7 @@ public class FriendshipService {
                 .findFirst().orElse(null);
     }
 
-    public Friendship addFriendship(Long requestingId, Long friendId) {
+    public void addFriendship(Long requestingId, Long friendId) {
         var users = find2UsersById(requestingId, friendId);
         User requstingUser = users.getFirst();
         User friend = users.getLast();
@@ -49,7 +48,6 @@ public class FriendshipService {
         userRepository.save(requstingUser);
         userRepository.save(friend);
 
-        return friendship;
     }
 
     public void removeFriendship(Long requestingId, Long friendId) {
@@ -72,24 +70,23 @@ public class FriendshipService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
 
-        List<User> friends = user.getFriendships().stream()
+        // filtering pending friendships
+        // getting the friend out of the friendship
+
+        return user.getFriendships().stream()
                 .filter(f -> f.getFriendAccepted() && f.getUserAccepted()) // filtering pending friendships
                 .map(f -> f.getMyFriend(user)) // getting the friend out of the friendship
                 .toList();
-
-        return friends;
     }
 
-    public List<PendingFriendshipResponse> getPendingFriendships(Long id) {
+    public List<PendingFriendshipDTO> getPendingFriendships(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<PendingFriendshipResponse> pendingFriendships = user.getFriendships().stream()
+        return user.getFriendships().stream()
                 .filter(f -> !(f.getFriendAccepted() && f.getUserAccepted()))
-                .map(this::mapToPendingResponse)
+                .map(this::mapToPendingDTO)
                 .toList();
-
-        return pendingFriendships;
     }
 
     private List<User> find2UsersById(Long id1, Long id2) {
@@ -98,12 +95,12 @@ public class FriendshipService {
 
         return List.of(user1, user2);
     }
-    private PendingFriendshipResponse mapToPendingResponse(Friendship friendship) {
+    private PendingFriendshipDTO mapToPendingDTO(Friendship friendship) {
         if (friendship.getFriendAccepted() && friendship.getUserAccepted()) return null;
         User acceptedOne = friendship.getUserAccepted() ? friendship.getUser() : friendship.getFriend();
         User pendingOne = (acceptedOne == friendship.getUser()) ? friendship.getFriend() : friendship.getUser();
 
-        return PendingFriendshipResponse.builder()
+        return PendingFriendshipDTO.builder()
                 .user(userService.getCurrentUser(acceptedOne.getEmail()))
                 .destination(userService.getCurrentUser(pendingOne.getEmail()))
                 .build();

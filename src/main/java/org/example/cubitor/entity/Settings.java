@@ -4,11 +4,13 @@ package org.example.cubitor.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Data
-public class SetSet {
+@Table(name = "settings_sets")
+public class Settings {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,8 +32,45 @@ public class SetSet {
     private String cubingGoal = "";
     private String favoriteEvent = "";
 
-    private WidgetConfig widgetConfig = new WidgetConfig(List.of(1, 2, 3, 4, 5), false);
-    private WidgetConfig minigameConfig = new WidgetConfig(List.of(1, 3, 6, 7, 0), true);
+    // Main list that creates 2 separate rows in a dedicated DB table
+    @ElementCollection
+    private List<WidgetConfig> widgetConfigs = new ArrayList<>();
+
+    // Fields for convenient Java access
+    @Transient private WidgetConfig widgetConfig =
+            new WidgetConfig(List.of(1, 2, 3, 4, 5), 0);
+
+    @Transient private WidgetConfig minigameConfig =
+            new WidgetConfig(List.of(1, 3, 6, 7, 0), 1);
+
+    // Moves data from individual fields into the list before saving to the DB
+    @PrePersist @PreUpdate
+    private void syncToDatabase() {
+        widgetConfigs.clear();
+        if (widgetConfig != null) {
+            widgetConfig.setStatus(0);
+            widgetConfigs.add(widgetConfig);
+        }
+        if (minigameConfig != null) {
+            minigameConfig.setStatus(1);
+            widgetConfigs.add(minigameConfig);
+        }
+    }
+
+    // Distributes rows from the list back into individual fields after loading from the DB
+    @PostLoad
+    private void syncFromDatabase() {
+        this.widgetConfig = widgetConfigs.stream()
+                .filter(c -> c.getStatus() == 0)
+                .findFirst()
+                .orElse(new WidgetConfig(List.of(1, 2, 3, 4, 5), 0));
+
+        this.minigameConfig = widgetConfigs.stream()
+                .filter(c -> c.getStatus() == 1)
+                .findFirst()
+                .orElse(new WidgetConfig(List.of(1, 3, 6, 7, 0), 1));
+    }
+
 
     @ElementCollection
     private List<StatBlock> statConfig = List.of(
@@ -63,12 +102,12 @@ public class SetSet {
         private Integer n4;
         private Integer n5;
 
-        private boolean isMinigame;
+        private Integer status;
 
         public WidgetConfig() {}
-        public WidgetConfig(List<Integer> config, boolean minigame) {
+        public WidgetConfig(List<Integer> config, int status) {
             setConfig(config);
-            this.isMinigame = minigame;
+            this.status = status;
         }
 
         @Transient
