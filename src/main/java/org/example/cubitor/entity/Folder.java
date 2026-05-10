@@ -1,21 +1,13 @@
 package org.example.cubitor.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 
 import java.util.List;
 
 @Entity
-@Data
-public class Folder {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    @ManyToOne(cascade = CascadeType.ALL)
-    private User user;
-
-    private String name;
-
+@DiscriminatorColumn(name = "FOLDER")
+public class Folder extends AlgCollection {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<Solve> solves;
 }
+

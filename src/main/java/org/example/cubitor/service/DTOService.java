@@ -56,8 +56,8 @@ public class DTOService {
                 .folderIDs(user.getFolders() != null ? user.getFolders().stream()
                         .map(Folder::getId)
                         .toList() : List.of())
-                .settingsID(user.getSettings().getId())
-                .roleID(user.getRole().ordinal())
+                .settingsID(user.getSettings() != null ? user.getSettings().getId() : null)
+                .roleID(user.getRole() != null ? user.getRole().ordinal() : null)
                 .build();
     }
 

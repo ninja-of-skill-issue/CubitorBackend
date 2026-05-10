@@ -29,12 +29,14 @@ public class SolveController {
     private final DTOService dtoService;
 
     @PostMapping("/add_solve")
-    public ResponseEntity<Solve> createSolve(@RequestBody Solve solve,
+    public ResponseEntity<SolveDTO> createSolve(@RequestBody SolveDTO solveDTO,
                                                @AuthenticationPrincipal User user) {
+        Solve solve = dtoService.toEntity(solveDTO);
         solve.setId(null);
         insertUserToSolve(solve, user);
-        solveRepository.save(solve);
-        return ResponseEntity.ok(solve);
+        Solve savedSolve = solveRepository.save(solve);
+
+        return ResponseEntity.ok(dtoService.toDTO(savedSolve));
     }
 
     @PostMapping("/delete_solves")

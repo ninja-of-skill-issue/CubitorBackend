@@ -1,13 +1,17 @@
 package org.example.cubitor.dto;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserDTO {
     private Long id;
     private String username;
@@ -21,8 +25,8 @@ public class UserDTO {
     private List<Long> friends;
     private List<Long> solveIDs;
     private List<Long> folderIDs;
-    private long settingsID;
-    private long roleID;
+    private Long settingsID;
+    private Integer roleID;
 
 }
 
